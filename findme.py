@@ -33,7 +33,7 @@ def getHwAddr(ifname):
 
 def findme(server_addr):
     data = urllib.urlencode({
-        'ifconfig': shell('ifconfig'),
+        'ifconfig': shell('/sbin/ifconfig'),
         'mac': getHwAddr('eth0'),
     })
     req = urllib2.Request(server_addr, data)

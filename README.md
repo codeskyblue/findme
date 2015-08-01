@@ -2,7 +2,7 @@
 
 ## Server
 
-	pip install flask
+	pip install flask tinydb
 	PORT=8858 python server.py
 
 Your can use `hostname -i` to find your server IP in most times.

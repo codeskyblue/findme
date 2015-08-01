@@ -6,40 +6,52 @@
 
 """
 findme server
+
+Dependencies:
+    http://flask.pocoo.org/
+    https://pypi.python.org/pypi/tinydb/
 """
 
 import os
+import time
+import socket
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime, timedelta
-import socket
+import tinydb
 
 
 PORT = int(os.getenv("PORT", 8858))
-CLEAN_INTERVAL = 10
-FINDS = {}
-
-
+db = tinydb.TinyDB('tinydb.json')
 app = Flask(__name__)
 
 @app.route('/api/findme', methods=['POST'])
 def findme_api():
-    print request.remote_addr
+    #print request.form
+    remote_addr = request.remote_addr
     mac = request.form.get('mac')
-    FINDS[request.remote_addr] = {
-        'updated_at': datetime.now(),
+    values = {
+        'remote_addr': remote_addr,
+        'updated_at': time.time(),
         'mac': mac,
         'ifconfig': request.form.get('ifconfig'),
     }
+    if db.contains(tinydb.where('remote_addr') == remote_addr):
+        db.update(values, tinydb.where('remote_addr') == remote_addr)
+    else:
+        db.insert(values)
     return jsonify({'success': True, 'message': '{} You will be found soon.'.format(mac)})
+
+@app.template_filter('strftime')
+def _jinja2_filter_datetime(timestamp, fmt='%Y-%m-%d %H:%M:%S'):
+    dt = datetime.utcfromtimestamp(float(timestamp))
+    return dt.strftime(fmt)
+
 
 @app.route('/')
 def homepage():
-    for key, val in FINDS.items():
-        if datetime.now() - val.get('updated_at') > timedelta(minutes=CLEAN_INTERVAL):
-            try:
-                del(FINDS[key])
-            except: pass
-    return render_template('homepage.html', finds=FINDS)
+    print time.time()
+    return render_template('homepage.html',
+        devs=db.search(tinydb.where('updated_at') > (int(time.time()-600)))) # 10min out of date
 
 def main():
     ip = socket.gethostbyname(socket.gethostname())

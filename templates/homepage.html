@@ -14,11 +14,11 @@
 		<div>
 			<h2>Find My <span class="rbcolor">Raspberry</span></h2>
 			<ul>
-				{% for remote_addr, dev in finds.items() %}
+				{% for dev in devs %}
 				<li>
-					<h4>{{remote_addr}} - <small>{{dev.mac}}</small></h4>
+					<h4>{{dev.remote_addr}} - <small>{{dev.mac}}</small></h4>
 					<div>
-						<p>Updated at: {{dev.updated_at}}</p>
+						<p>Updated at: {{dev.updated_at|strftime}}</p>
 						<label><u>$ ifconfig</u></label>
 						<pre>{{dev.ifconfig}}</pre>
 					</div>
