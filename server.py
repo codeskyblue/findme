@@ -10,10 +10,12 @@ findme server
 
 import os
 from flask import Flask, render_template, request, jsonify
-from datetime import datetime
+from datetime import datetime, timedelta
+import socket
 
 
 PORT = int(os.getenv("PORT", 8858))
+CLEAN_INTERVAL = 10
 FINDS = {}
 
 
@@ -24,6 +26,7 @@ def findme_api():
     print request.remote_addr
     mac = request.form.get('mac')
     FINDS[request.remote_addr] = {
+        'updated_at': datetime.now(),
         'mac': mac,
         'ifconfig': request.form.get('ifconfig'),
     }
@@ -31,16 +34,23 @@ def findme_api():
 
 @app.route('/')
 def homepage():
+    for key, val in FINDS.items():
+        if datetime.now() - val.get('updated_at') > timedelta(minutes=CLEAN_INTERVAL):
+            try:
+                del(FINDS[key])
+            except: pass
     return render_template('homepage.html', finds=FINDS)
 
-
 def main():
-    global FINDS
-    FINDS['10.234.12.12'] = {
-        'updated_at': datetime.now(),
-        'ifconfig': 'haha nice',
-        'mac': 'b8-slkj',
-    }
+    ip = socket.gethostbyname(socket.gethostname())
+    print 'Start client by --.'
+    print '>>> $ SERVER=http://{ip}:{port}/api/findme python findme.py'.format(
+        ip=ip, port=PORT)
+    #FINDS['10.234.12.12'] = {
+    #    'updated_at': datetime.now(),
+    #    'ifconfig': 'haha nice',
+    #    'mac': 'b8-slkj',
+    #}
     app.run(host='0.0.0.0', port=PORT, debug=True)
 
 

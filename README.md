@@ -11,5 +11,9 @@ Your can use `hostname -i` to find your server IP in most times.
 
 	SERVER=http://<your-server-ip>:8858/api/findme python findme.py
 
+It is recommend to add to crontab, open crontab with `crontab -e`
+
+	* * * * * SERVER=http://10.246.13.180:8858/api/findme python findme.py
+
 ## LICENSE
 [MIT](LICENSE)

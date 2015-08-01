@@ -11,6 +11,8 @@ Third lib:
     https://pypi.python.org/pypi/urlfetch
 """
 
+import os
+import sys
 import subprocess
 import urllib, urllib2
 import fcntl, socket, struct
@@ -35,7 +37,7 @@ def findme(server_addr):
         'mac': getHwAddr('eth0'),
     })
     req = urllib2.Request(server_addr, data)
-    response = urllib2.urlopen(req)
+    response = urllib2.urlopen(req, timeout=5)
     print response.read()
 
 
@@ -43,4 +45,7 @@ def test():
     print getHwAddr('eth0')
 
 if __name__ == '__main__':
-    findme('http://10.246.13.180:8858/api/findme')
+    SERVER=os.getenv('SERVER')
+    if not SERVER:
+        sys.exit("Need env-var: SERVER")
+    findme(SERVER)
