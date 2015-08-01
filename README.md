@@ -1,5 +1,7 @@
 # Find My Raspberry
 
+![findrb](static/favicon.png)
+
 ## Server
 
 	pip install flask tinydb

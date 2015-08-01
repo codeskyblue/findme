@@ -27,16 +27,16 @@ app = Flask(__name__)
 @app.route('/api/findme', methods=['POST'])
 def findme_api():
     #print request.form
-    remote_addr = request.remote_addr
     mac = request.form.get('mac')
+    remote_addr = request.remote_addr
     values = {
         'remote_addr': remote_addr,
         'updated_at': time.time(),
         'mac': mac,
         'ifconfig': request.form.get('ifconfig'),
     }
-    if db.contains(tinydb.where('remote_addr') == remote_addr):
-        db.update(values, tinydb.where('remote_addr') == remote_addr)
+    if db.contains(tinydb.where('mac') == mac):
+        db.update(values, tinydb.where('mac') == mac)
     else:
         db.insert(values)
     return jsonify({'success': True, 'message': '{} You will be found soon.'.format(mac)})
@@ -46,10 +46,8 @@ def _jinja2_filter_datetime(timestamp, fmt='%Y-%m-%d %H:%M:%S'):
     dt = datetime.utcfromtimestamp(float(timestamp))
     return dt.strftime(fmt)
 
-
 @app.route('/')
 def homepage():
-    print time.time()
     return render_template('homepage.html',
         devs=db.search(tinydb.where('updated_at') > (int(time.time()-600)))) # 10min out of date
 
