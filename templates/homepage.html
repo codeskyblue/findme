@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="utf-8" />
+		<title>homepage</title>
+		<style>
+			.rbcolor {
+				color: blue;
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<h2>Find My <span class="rbcolor">Raspberry</span></h2>
+			<ul>
+				{% for remote_addr, dev in finds.items() %}
+				<li>
+					<h4>{{remote_addr}} - <small>{{dev.mac}}</small></h4>
+					<div>
+						<p>Updated at: {{dev.updated_at}}</p>
+						<label><u>$ ifconfig</u></label>
+						<pre>{{dev.ifconfig}}</pre>
+					</div>
+				</li>
+				{% endfor %}
+			</ul>
+	</body>
+</html>
